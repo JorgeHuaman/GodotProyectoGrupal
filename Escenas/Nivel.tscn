@@ -1,13 +1,18 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Recursos/tile000 arreglado.png" type="Texture" id=1]
 [ext_resource path="res://Recursos/pruebas de sprite red diamont.png" type="Texture" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
 
-[sub_resource type="CapsuleShape2D" id=2]
-radius = 74.511
-height = 215.659
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 81.9854, 7.1938 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 22, 110 )
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 109, 24 )
 
 [node name="Nivel" type="Node2D"]
 
@@ -44,14 +49,41 @@ texture = ExtResource( 1 )
 shape = SubResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="."]
-position = Vector2( 519.5, 331.5 )
+position = Vector2( 293.5, 186.5 )
 scale = Vector2( 2.14063, 2.01563 )
 texture = ExtResource( 2 )
 __meta__ = {
 "_edit_group_": true
 }
 
-[node name="StaticBody2D" type="StaticBody2D" parent="Sprite"]
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2( 293.5, 186.5 )
+scale = Vector2( 2.14063, 2.01563 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/StaticBody2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2( 0.467163, 48.124 )
 shape = SubResource( 2 )
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+position = Vector2( 468, 186 )
+shape = SubResource( 3 )
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
+position = Vector2( 125, 183 )
+shape = SubResource( 3 )
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D4"]
+position = Vector2( 175, 75 )
+shape = SubResource( 4 )
+
+[node name="StaticBody2D5" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D5"]
+position = Vector2( 449, 75 )
+shape = SubResource( 4 )
