@@ -1,3 +1,18 @@
-[gd_scene format=2]
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Escenas/Mineral.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Escenas/Personaje.tscn" type="PackedScene" id=2]
 
 [node name="NiveldePrueba" type="Node2D"]
+
+[node name="Mineral" parent="." instance=ExtResource( 1 )]
+position = Vector2( 428.984, 164.315 )
+
+[node name="Mineral2" parent="." instance=ExtResource( 1 )]
+position = Vector2( 132.037, 117.588 )
+
+[node name="Mineral3" parent="." instance=ExtResource( 1 )]
+position = Vector2( 276.742, 318.064 )
+
+[node name="Personaje" parent="." instance=ExtResource( 2 )]
+position = Vector2( 192.586, 191.669 )

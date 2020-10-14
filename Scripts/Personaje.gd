@@ -1,45 +1,123 @@
 extends KinematicBody2D
 
-var direccion = "Zero"
+#Direccion a donde mira
+var direccion = Vector2(0,0)
+#Si está o no moviendose
+var en_movimiento = false
+#Vector de movimiento
+var movimiento = Vector2(0,0)
+#Velocidad de movimiento
+var velocidad = 120
+#Para detectar si está empujado y no se pueda mover
+var esta_empujando = false
+
+#Maquina de estados
+enum {IDLE, WALK, PUSH}
+var estado
+var animacion_actual
+var animacion_nueva
 
 func _ready():
 	#Animación Inicial
-	$AnimatedSprite.animation = "Start"
+	$AnimatedSprite.animation = "IdleDown"
+	_transicion_a(IDLE)
 	
 func _physics_process(delta):
 	
+	#Maquina de estados
+	if animacion_actual != animacion_nueva:
+		animacion_actual = animacion_nueva
+		$AnimatedSprite.play(animacion_actual)
+	
 	#Para el movimiento
-	if Input.is_action_pressed("ui_down") and (direccion == "Down" or direccion == "Zero"):
-		position.y += 2
-		direccion = "Down"
-	elif Input.is_action_pressed("ui_up") and (direccion == "Up" or direccion == "Zero"):
-		position.y -= 2
-		direccion = "Up"
-	elif Input.is_action_pressed("ui_left") and (direccion == "Left" or direccion == "Zero"):
-		position.x -= 2
-		direccion = "Left"
-	elif Input.is_action_pressed("ui_right") and (direccion == "Right" or direccion == "Zero"):
-		position.x += 2
-		direccion = "Right"
+	movimiento = Vector2(0,0)
+	
+	if Input.is_action_pressed("ui_down") and (direccion == Vector2(0,1) or en_movimiento == false) and esta_empujando == false:
+		movimiento.y += 1
+		direccion = Vector2(0,1)
+		en_movimiento = true
+	elif Input.is_action_pressed("ui_up") and (direccion == Vector2(0,-1) or en_movimiento == false) and esta_empujando == false:
+		movimiento.y -= 1
+		direccion = Vector2(0,-1)
+		en_movimiento = true
+	elif Input.is_action_pressed("ui_left") and (direccion == Vector2(-1,0) or en_movimiento == false) and esta_empujando == false:
+		movimiento.x -= 1
+		direccion = Vector2(-1,0)
+		en_movimiento = true
+	elif Input.is_action_pressed("ui_right") and (direccion == Vector2(1,0) or en_movimiento == false) and esta_empujando == false:
+		movimiento.x += 1
+		direccion = Vector2(1,0)
+		en_movimiento = true
+	else:
+		en_movimiento = false
 		
+	movimiento = movimiento.normalized()*velocidad
+	move_and_slide(movimiento,Vector2(0,0))
+	
 	#Para asegurarse que está mirando a la dirección correcta puedes usar este print
 	#print(direccion)
 		
-	#Para seleccionar la animación correcta
-	if Input.is_action_just_pressed("ui_down") and direccion == "Down":
-		$AnimatedSprite.animation = "WalkDown"
-		$AnimatedSprite.play()
-	elif Input.is_action_just_pressed("ui_up") and direccion == "Up":
-		$AnimatedSprite.animation = "WalkUp"
-		$AnimatedSprite.play()
-	elif Input.is_action_just_pressed("ui_left") and direccion == "Left":
-		$AnimatedSprite.animation = "WalkLeft"
-		$AnimatedSprite.play()
-	elif Input.is_action_just_pressed("ui_right") and direccion == "Right":
-		$AnimatedSprite.animation = "WalkRight"
-		$AnimatedSprite.play()
+	if estado == IDLE and en_movimiento == true:
+		_transicion_a(WALK)
 		
-	if Input.is_action_just_released("ui_up") or Input.is_action_just_released("ui_down") or Input.is_action_just_released("ui_left") or Input.is_action_just_released("ui_right"):
-		direccion = "Zero"
-		$AnimatedSprite.animation = "Start"
+	if estado == WALK and en_movimiento == false:
+		_transicion_a(IDLE)
 		
+	if estado in [IDLE,WALK] and Input.is_action_just_pressed("ui_accept"):
+		_transicion_a(PUSH)
+		_push()
+		esta_empujando = true
+		yield($AnimatedSprite, "animation_finished")
+		esta_empujando = false
+		_nopush()
+		_transicion_a(IDLE)
+
+#Activar empujar
+func _push():
+	if direccion == Vector2(0,1):
+		$AreaEmpujeAbajo/Abajo.disabled = false
+	elif direccion == Vector2(0,-1):
+		$AreaEmpujeArriba/Arriba.disabled = false
+	elif direccion == Vector2(-1,0):
+		$AreaEmpujeIzquierda/Izquierda.disabled = false
+	elif direccion == Vector2(1,0):
+		$AreaEmpujeDerecha/Derecha.disabled = false
+		
+#Desactivar empujar
+func _nopush():
+		$AreaEmpujeAbajo/Abajo.disabled = true
+		$AreaEmpujeArriba/Arriba.disabled = true
+		$AreaEmpujeIzquierda/Izquierda.disabled = true
+		$AreaEmpujeDerecha/Derecha.disabled = true
+
+#Maquina de estados
+func _transicion_a(nuevo_estado):
+	estado = nuevo_estado
+	match estado:
+		IDLE:
+			if direccion == Vector2(0,1):
+				animacion_nueva = "IdleDown"
+			elif direccion == Vector2(0,-1):
+				animacion_nueva = "IdleUp"
+			elif direccion == Vector2(-1,0):
+				animacion_nueva = "IdleLeft"
+			elif direccion == Vector2(1,0):
+				animacion_nueva = "IdleRight"
+		WALK:
+			if direccion == Vector2(0,1):
+				animacion_nueva = "WalkDown"
+			elif direccion == Vector2(0,-1):
+				animacion_nueva = "WalkUp"
+			elif direccion == Vector2(-1,0):
+				animacion_nueva = "WalkLeft"
+			elif direccion == Vector2(1,0):
+				animacion_nueva = "WalkRight"
+		PUSH:
+			if direccion == Vector2(0,1):
+				animacion_nueva = "PushDown"
+			elif direccion == Vector2(0,-1):
+				animacion_nueva = "PushUp"
+			elif direccion == Vector2(-1,0):
+				animacion_nueva = "PushLeft"
+			elif direccion == Vector2(1,0):
+				animacion_nueva = "PushRight"
