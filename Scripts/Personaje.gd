@@ -17,6 +17,8 @@ var estado
 var animacion_actual
 var animacion_nueva
 
+var polvo_fijado = null
+
 func _ready():
 	#Animación Inicial
 	$AnimatedSprite.animation = "IdleDown"
@@ -121,3 +123,23 @@ func _transicion_a(nuevo_estado):
 				animacion_nueva = "PushLeft"
 			elif direccion == Vector2(1,0):
 				animacion_nueva = "PushRight"
+
+#Función para detectar el polvo de mineral cuando está cerca
+func _on_AreaRecogePolvo_body_entered(body):
+	if body.is_in_group("Mineral"):
+		if body.solido == false:
+			polvo_fijado = body
+			
+#Función para para dejar de detectar el polvo de mineral cuando no está cerca
+func _on_AreaRecogePolvo_body_exited(body):
+	if body.is_in_group("Mineral"):
+		if body.solido == false:
+			polvo_fijado = null
+			
+#Función para recoger mineral
+func _input(event):
+	if event.is_action_pressed("ui_z"):
+		if polvo_fijado != null:
+			polvo_fijado.queue_free()
+		
+
